@@ -1,0 +1,22 @@
+[{
+  "name": "",
+  "author": "",
+  "data": [{
+    "name": "sheet 1",
+    "header": [{
+        "id": "id",
+        "name": "header 1",
+        "width": 10
+      },
+      {
+        "id": "id2",
+        "name": "header 2",
+        "width": 10
+      }
+    ],
+    "rows": [{
+      "id1": 1,
+      "id2": "John Doe"
+    }]
+  }]
+}]
