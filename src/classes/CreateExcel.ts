@@ -6,14 +6,14 @@ export default class CreateExcel {
   private workbook: Excel.Workbook;
   private sheets: Array<{
     name: string,
-    header: Array<{ id: string | number, name: string }>,
+    header: Array<{ key: string | number, header: string }>,
     rows: Array<{}>
   }>
 
   constructor(
     sheets: Array<{
       name: string,
-      header: Array<{ id: string | number, name: string }>,
+      header: Array<{ key: string | number, header: string }>,
       rows: Array<{}>
     }>,
     author?: string) {
@@ -31,12 +31,11 @@ export default class CreateExcel {
       sheet.state = 'visible';
       await this.addHeader(sheet, argSheet.header);
       this.addRows(sheet, argSheet.rows);
-
     })
 
   }
 
-  public addHeader(sheet: any, headers: Array<{ id: string | number, name: string }>): void {
+  public addHeader(sheet: any, headers: Array<{ key: string | number, header: string }>): void {
     if (sheet.columns && sheet.columns.length > 0) {
       sheet.columns = [...sheet.columns, ...headers]
     } else {
@@ -46,7 +45,6 @@ export default class CreateExcel {
 
   public addRows(sheet, argRows: Array<{}> | Object): void {
     let rows = Array.isArray(argRows) ? argRows : [argRows];
-
     rows.forEach(row => {
       sheet.addRow(row);
     })

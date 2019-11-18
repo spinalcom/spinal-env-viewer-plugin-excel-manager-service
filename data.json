@@ -4,13 +4,13 @@
   "data": [{
     "name": "sheet 1",
     "header": [{
-        "id": "id",
-        "name": "header 1",
+        "key": "id",
+        "header": "header 1",
         "width": 10
       },
       {
-        "id": "id2",
-        "name": "header 2",
+        "key": "id2",
+        "header": "header 2",
         "width": 10
       }
     ],
