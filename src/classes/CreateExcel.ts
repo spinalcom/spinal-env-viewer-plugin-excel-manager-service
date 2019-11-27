@@ -52,6 +52,7 @@ export default class CreateExcel {
   }
 
   public getWorkbook(): any {
+    console.log(this.workbook);
     return this.workbook.xlsx.writeBuffer();
   }
 
