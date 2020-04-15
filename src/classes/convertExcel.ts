@@ -88,7 +88,7 @@ export default class ConvertExcel {
             }
         });
 
-        return result.value;
+        return result ? result.value : "";
     }
 
 }

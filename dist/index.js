@@ -52,7 +52,7 @@ class SpinalExcelManager {
             fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
                 const data = _file.target.result;
                 const json = yield convertExcel.toJson(data);
-                resolve(json);
+                return resolve(json);
             });
             //     ///////////////////////////////////////////////
             //     //                  On Error

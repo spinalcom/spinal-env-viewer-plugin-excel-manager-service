@@ -61,7 +61,7 @@ export default class SpinalExcelManager {
 
                 const json = await convertExcel.toJson(data);
 
-                resolve(json);
+                return resolve(json);
 
             }
 
