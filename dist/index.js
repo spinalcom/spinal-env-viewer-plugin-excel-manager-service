@@ -63,6 +63,26 @@ class SpinalExcelManager {
             fileReader.readAsArrayBuffer(file);
         });
     }
+    static convertConfigurationFile(file) {
+        const headerRow = 5;
+        const convertExcel = new convertExcel_1.default();
+        const fileReader = new FileReader();
+        // console.log("file", file);
+        return new Promise((resolve, reject) => {
+            fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
+                const data = _file.target.result;
+                const json = yield convertExcel.configurationToJson(data, headerRow);
+                return resolve(json);
+            });
+            //     ///////////////////////////////////////////////
+            //     //                  On Error
+            //     ///////////////////////////////////////////////
+            fileReader.onerror = err => {
+                reject(err);
+            };
+            fileReader.readAsArrayBuffer(file);
+        });
+    }
 }
 exports.default = SpinalExcelManager;
 window.excelManager = SpinalExcelManager;

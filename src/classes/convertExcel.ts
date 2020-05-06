@@ -28,22 +28,23 @@ export default class ConvertExcel {
 
     private workbook: Excel.Workbook;
 
-    constructor() {
+    constructor(headerRow: number = 1) {
         this.workbook = new Excel.Workbook();
+
     }
 
-    public async toJson(data: any): Promise<any> {
+    public async toJson(data: any, headerRow: number = 1): Promise<any> {
         await this.workbook.xlsx.load(data);
         let result = {}
 
         this.workbook.eachSheet((sheet) => {
 
-            let begin = 2;
+            let begin = headerRow + 1;
             const end = sheet.rowCount;
 
             result[sheet.name] = [];
 
-            let headers = this._getHeaders(sheet);
+            let headers = this._getHeaders(sheet, headerRow);
 
             for (; begin <= end; begin++) {
                 let res = {};
@@ -55,18 +56,16 @@ export default class ConvertExcel {
                 result[sheet.name].push(res);
             }
 
-
-
         })
 
         return result;
     }
 
-    private _getHeaders(sheet) {
+    private _getHeaders(sheet: any, headerRow: number = 1) {
         let result: string[] = [];
-        let index = 1;
+        // let index = 1;
 
-        let row = sheet.getRow(index);
+        let row = sheet.getRow(headerRow);
 
         if (row === null || !row.values || !row.values.length) return [];
 
@@ -89,6 +88,43 @@ export default class ConvertExcel {
         });
 
         return result ? result.value : "";
+    }
+
+    public async configurationToJson(data: any, headerRow): Promise<any> {
+        await this.workbook.xlsx.load(data);
+
+        let result = {}
+
+        this.workbook.eachSheet((sheet) => {
+
+            let begin = headerRow + 1;
+            const end = sheet.rowCount;
+
+            result[sheet.name] = [];
+
+            let headers = this._getHeaders(sheet, headerRow);
+
+            for (; begin <= end; begin++) {
+                let res = {};
+
+                headers.forEach(header => {
+                    res[header] = this._getValueByColumnHeader(sheet, begin, headers, header);
+                })
+
+                const firstConfHeader = this._getHeaders(sheet, 1);
+
+                firstConfHeader.forEach(el => {
+                    res[el] = this._getValueByColumnHeader(sheet, 2, firstConfHeader, el);
+                })
+
+                result[sheet.name].push(res);
+            }
+
+
+
+        })
+
+        return result;
     }
 
 }

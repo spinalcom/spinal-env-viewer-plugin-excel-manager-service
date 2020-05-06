@@ -34,18 +34,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Excel = require("exceljs");
 class ConvertExcel {
-    constructor() {
+    constructor(headerRow = 1) {
         this.workbook = new Excel.Workbook();
     }
-    toJson(data) {
+    toJson(data, headerRow = 1) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.workbook.xlsx.load(data);
             let result = {};
             this.workbook.eachSheet((sheet) => {
-                let begin = 2;
+                let begin = headerRow + 1;
                 const end = sheet.rowCount;
                 result[sheet.name] = [];
-                let headers = this._getHeaders(sheet);
+                let headers = this._getHeaders(sheet, headerRow);
                 for (; begin <= end; begin++) {
                     let res = {};
                     headers.forEach(header => {
@@ -57,10 +57,10 @@ class ConvertExcel {
             return result;
         });
     }
-    _getHeaders(sheet) {
+    _getHeaders(sheet, headerRow = 1) {
         let result = [];
-        let index = 1;
-        let row = sheet.getRow(index);
+        // let index = 1;
+        let row = sheet.getRow(headerRow);
         if (row === null || !row.values || !row.values.length)
             return [];
         for (let i = 1; i < row.values.length; i++) {
@@ -79,6 +79,30 @@ class ConvertExcel {
             }
         });
         return result ? result.value : "";
+    }
+    configurationToJson(data, headerRow) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.workbook.xlsx.load(data);
+            let result = {};
+            this.workbook.eachSheet((sheet) => {
+                let begin = headerRow + 1;
+                const end = sheet.rowCount;
+                result[sheet.name] = [];
+                let headers = this._getHeaders(sheet, headerRow);
+                for (; begin <= end; begin++) {
+                    let res = {};
+                    headers.forEach(header => {
+                        res[header] = this._getValueByColumnHeader(sheet, begin, headers, header);
+                    });
+                    const firstConfHeader = this._getHeaders(sheet, 1);
+                    firstConfHeader.forEach(el => {
+                        res[el] = this._getValueByColumnHeader(sheet, 2, firstConfHeader, el);
+                    });
+                    result[sheet.name].push(res);
+                }
+            });
+            return result;
+        });
     }
 }
 exports.default = ConvertExcel;

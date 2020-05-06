@@ -45,6 +45,7 @@ export default class SpinalExcelManager {
         return Promise.all(promises);
     }
 
+
     public static convertExcelToJson(file: any): Promise<any> {
         const convertExcel = new ConvertExcel();
 
@@ -82,6 +83,40 @@ export default class SpinalExcelManager {
     }
 
 
+    public static convertConfigurationFile(file: any): Promise<any> {
+        const headerRow = 5;
+        const convertExcel = new ConvertExcel();
+
+        const fileReader = new FileReader();
+
+
+        // console.log("file", file);
+
+        return new Promise((resolve, reject) => {
+
+            fileReader.onload = async (_file) => {
+                const data = _file.target.result;
+
+
+                const json = await convertExcel.configurationToJson(data, headerRow);
+
+                return resolve(json);
+
+            }
+
+            //     ///////////////////////////////////////////////
+            //     //                  On Error
+            //     ///////////////////////////////////////////////
+            fileReader.onerror = err => {
+                reject(err);
+            };
+
+
+            fileReader.readAsArrayBuffer(file);
+
+
+        })
+    }
 
 
 
