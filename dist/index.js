@@ -64,7 +64,7 @@ class SpinalExcelManager {
         });
     }
     static convertConfigurationFile(file) {
-        const headerRow = 5;
+        const headerRow = 6;
         const convertExcel = new convertExcel_1.default();
         const fileReader = new FileReader();
         // console.log("file", file);
@@ -74,9 +74,9 @@ class SpinalExcelManager {
                 const json = yield convertExcel.configurationToJson(data, headerRow);
                 return resolve(json);
             });
-            //     ///////////////////////////////////////////////
-            //     //                  On Error
-            //     ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            //                  On Error
+            ///////////////////////////////////////////////
             fileReader.onerror = err => {
                 reject(err);
             };

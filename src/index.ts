@@ -84,7 +84,7 @@ export default class SpinalExcelManager {
 
 
     public static convertConfigurationFile(file: any): Promise<any> {
-        const headerRow = 5;
+        const headerRow = 6;
         const convertExcel = new ConvertExcel();
 
         const fileReader = new FileReader();
@@ -104,9 +104,9 @@ export default class SpinalExcelManager {
 
             }
 
-            //     ///////////////////////////////////////////////
-            //     //                  On Error
-            //     ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            //                  On Error
+            ///////////////////////////////////////////////
             fileReader.onerror = err => {
                 reject(err);
             };

@@ -111,11 +111,21 @@ export default class ConvertExcel {
                     res[header] = this._getValueByColumnHeader(sheet, begin, headers, header);
                 })
 
-                const firstConfHeader = this._getHeaders(sheet, 1);
+                // const firstConfHeader = this._getHeaders(sheet, 1);
 
-                firstConfHeader.forEach(el => {
-                    res[el] = this._getValueByColumnHeader(sheet, 2, firstConfHeader, el);
-                })
+                // firstConfHeader.forEach(el => {
+                //     res[el] = this._getValueByColumnHeader(sheet, 2, firstConfHeader, el);
+                // })
+
+                for (let index = 1; index <= 3; index++) {
+                    const header = this._getHeaders(sheet, index);
+
+                    console.log("header", header);
+
+                    const key = header[0].replace(":", "").trim();
+                    const value = header[1];
+                    res[key] = value;
+                }
 
                 result[sheet.name].push(res);
             }
