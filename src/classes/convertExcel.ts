@@ -82,7 +82,7 @@ export default class ConvertExcel {
 
         row.eachCell(function (cell: Excel.Cell, colNumber: number) {
             let fetchedHeader: string = headers[colNumber - 1];
-            if (fetchedHeader.toLowerCase().trim() === header.toLowerCase().trim()) {
+            if ((fetchedHeader && header) && fetchedHeader.toLowerCase().trim() === header.toLowerCase().trim()) {
                 result = cell;
             }
         });
