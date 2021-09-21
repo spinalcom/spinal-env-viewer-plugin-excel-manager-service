@@ -74,7 +74,7 @@ class ConvertExcel {
         let result;
         row.eachCell(function (cell, colNumber) {
             let fetchedHeader = headers[colNumber - 1];
-            if (fetchedHeader.toLowerCase().trim() === header.toLowerCase().trim()) {
+            if ((fetchedHeader && header) && fetchedHeader.toLowerCase().trim() === header.toLowerCase().trim()) {
                 result = cell;
             }
         });

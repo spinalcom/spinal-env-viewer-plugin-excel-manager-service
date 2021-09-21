@@ -32,6 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.excelManager = exports.SpinalExcelManager = void 0;
 const CreateExcel_1 = require("./classes/CreateExcel");
 const convertExcel_1 = require("./classes/convertExcel");
 class SpinalExcelManager {
@@ -85,5 +86,14 @@ class SpinalExcelManager {
     }
 }
 exports.default = SpinalExcelManager;
-window.excelManager = SpinalExcelManager;
+exports.SpinalExcelManager = SpinalExcelManager;
+const globalRoot = typeof window === "undefined" ? global : window;
+if (typeof globalRoot.spinal === 'undefined')
+    globalRoot.spinal = {};
+if (typeof globalRoot.spinal.excelManager === 'undefined') {
+    globalRoot.spinal.excelManager = SpinalExcelManager;
+}
+globalRoot.excelManager = SpinalExcelManager;
+const excelManager = SpinalExcelManager;
+exports.excelManager = excelManager;
 //# sourceMappingURL=index.js.map

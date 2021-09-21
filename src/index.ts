@@ -26,9 +26,7 @@ import CreateExcel from "./classes/CreateExcel";
 import ConvertExcel from "./classes/convertExcel";
 import * as fs from "fs";
 
-declare global {
-    interface Window { excelManager: any }
-}
+
 
 
 export default class SpinalExcelManager {
@@ -122,5 +120,16 @@ export default class SpinalExcelManager {
 
 }
 
+const globalRoot: any = typeof window === "undefined" ? global : window;
+if (typeof globalRoot.spinal === 'undefined') globalRoot.spinal = {};
+if (typeof globalRoot.spinal.excelManager === 'undefined') {
+    globalRoot.spinal.excelManager = SpinalExcelManager;
+}
 
-window.excelManager = SpinalExcelManager;
+globalRoot.excelManager = SpinalExcelManager;
+const excelManager = SpinalExcelManager;
+
+export {
+    SpinalExcelManager,
+    excelManager
+}
