@@ -80,4 +80,8 @@ export default class CreateExcel {
     return this.workbook.xlsx.writeBuffer();
   }
 
+  public getWorkbookInstance() {
+    return this.workbook;
+  }
+
 }

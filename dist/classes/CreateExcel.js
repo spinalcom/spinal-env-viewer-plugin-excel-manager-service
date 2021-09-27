@@ -65,6 +65,9 @@ class CreateExcel {
         // console.log(this.workbook);
         return this.workbook.xlsx.writeBuffer();
     }
+    getWorkbookInstance() {
+        return this.workbook;
+    }
 }
 exports.default = CreateExcel;
 //# sourceMappingURL=CreateExcel.js.map

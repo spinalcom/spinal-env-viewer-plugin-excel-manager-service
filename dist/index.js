@@ -35,6 +35,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.excelManager = exports.SpinalExcelManager = void 0;
 const CreateExcel_1 = require("./classes/CreateExcel");
 const convertExcel_1 = require("./classes/convertExcel");
+const filereader_1 = require("filereader");
 class SpinalExcelManager {
     static export(argExcelsData) {
         let excelsData = Array.isArray(argExcelsData) ? argExcelsData : [argExcelsData];
@@ -45,9 +46,18 @@ class SpinalExcelManager {
         }));
         return Promise.all(promises);
     }
+    static exportViaWorkbook(argExcelsData) {
+        let excelsData = Array.isArray(argExcelsData) ? argExcelsData : [argExcelsData];
+        let promises = excelsData.map((excel) => __awaiter(this, void 0, void 0, function* () {
+            let createExcel = new CreateExcel_1.default(excel.data);
+            yield createExcel.createSheet();
+            return createExcel.getWorkbookInstance();
+        }));
+        return Promise.all(promises);
+    }
     static convertExcelToJson(file) {
         const convertExcel = new convertExcel_1.default();
-        const fileReader = new FileReader();
+        const fileReader = new filereader_1.default();
         // console.log("file", file);
         return new Promise((resolve, reject) => {
             fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
@@ -67,7 +77,7 @@ class SpinalExcelManager {
     static convertConfigurationFile(file) {
         const headerRow = 6;
         const convertExcel = new convertExcel_1.default();
-        const fileReader = new FileReader();
+        const fileReader = new filereader_1.default();
         // console.log("file", file);
         return new Promise((resolve, reject) => {
             fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {

@@ -24,7 +24,7 @@
 
 import CreateExcel from "./classes/CreateExcel";
 import ConvertExcel from "./classes/convertExcel";
-import * as fs from "fs";
+import FileReader from "filereader";
 
 
 
@@ -38,6 +38,18 @@ export default class SpinalExcelManager {
             let createExcel = new CreateExcel(excel.data);
             await createExcel.createSheet();
             return createExcel.getWorkbook();
+        })
+
+        return Promise.all(promises);
+    }
+
+    public static exportViaWorkbook(argExcelsData: Array<any> | Object) {
+        let excelsData = Array.isArray(argExcelsData) ? argExcelsData : [argExcelsData];
+
+        let promises = excelsData.map(async excel => {
+            let createExcel = new CreateExcel(excel.data);
+            await createExcel.createSheet();
+            return createExcel.getWorkbookInstance();
         })
 
         return Promise.all(promises);

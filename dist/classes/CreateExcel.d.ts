@@ -1,3 +1,4 @@
+import * as Excel from "exceljs";
 export default class CreateExcel {
     private workbook;
     private sheets;
@@ -16,4 +17,5 @@ export default class CreateExcel {
     }>): void;
     addRows(sheet: any, argRows: Array<{}> | Object): void;
     getWorkbook(): any;
+    getWorkbookInstance(): Excel.Workbook;
 }
