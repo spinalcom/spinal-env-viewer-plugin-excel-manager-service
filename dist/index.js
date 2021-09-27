@@ -36,6 +36,7 @@ exports.excelManager = exports.SpinalExcelManager = void 0;
 const CreateExcel_1 = require("./classes/CreateExcel");
 const convertExcel_1 = require("./classes/convertExcel");
 const filereader_1 = require("filereader");
+// console.log("FileReader", FileReader)
 class SpinalExcelManager {
     static export(argExcelsData) {
         let excelsData = Array.isArray(argExcelsData) ? argExcelsData : [argExcelsData];
@@ -57,10 +58,10 @@ class SpinalExcelManager {
     }
     static convertExcelToJson(file) {
         const convertExcel = new convertExcel_1.default();
-        const fileReader = new filereader_1.default();
+        // const fileReader = new FileReader();
         // console.log("file", file);
         return new Promise((resolve, reject) => {
-            fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
+            filereader_1.default.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
                 const data = _file.target.result;
                 const json = yield convertExcel.toJson(data);
                 return resolve(json);
@@ -68,16 +69,16 @@ class SpinalExcelManager {
             //     ///////////////////////////////////////////////
             //     //                  On Error
             //     ///////////////////////////////////////////////
-            fileReader.onerror = err => {
+            filereader_1.default.onerror = err => {
                 reject(err);
             };
-            fileReader.readAsArrayBuffer(file);
+            filereader_1.default.readAsArrayBuffer(file);
         });
     }
     static convertConfigurationFile(file) {
         const headerRow = 6;
         const convertExcel = new convertExcel_1.default();
-        const fileReader = new filereader_1.default();
+        const fileReader = new FileReader();
         // console.log("file", file);
         return new Promise((resolve, reject) => {
             fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {

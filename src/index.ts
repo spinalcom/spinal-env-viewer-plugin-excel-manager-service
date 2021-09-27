@@ -24,9 +24,9 @@
 
 import CreateExcel from "./classes/CreateExcel";
 import ConvertExcel from "./classes/convertExcel";
-import FileReader from "filereader";
+import fileReader from "filereader";
 
-
+// console.log("FileReader", FileReader)
 
 
 export default class SpinalExcelManager {
@@ -59,7 +59,7 @@ export default class SpinalExcelManager {
     public static convertExcelToJson(file: any): Promise<any> {
         const convertExcel = new ConvertExcel();
 
-        const fileReader = new FileReader();
+        // const fileReader = new FileReader();
 
 
         // console.log("file", file);
