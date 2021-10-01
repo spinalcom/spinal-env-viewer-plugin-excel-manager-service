@@ -4,10 +4,12 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rm -rf dist && tsc",
+    "start": "npm run build && node test.js",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "blob-to-stream": "^1.0.3",
     "exceljs": "^3.4.0",
     "filereader": "^0.10.3",
     "ts-loader": "^5.4.3",

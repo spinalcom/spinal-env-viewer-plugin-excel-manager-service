@@ -24,7 +24,8 @@
 
 import CreateExcel from "./classes/CreateExcel";
 import ConvertExcel from "./classes/convertExcel";
-import fileReader from "filereader";
+import { readFileSync } from "fs";
+import { stream } from "exceljs";
 
 // console.log("FileReader", FileReader)
 
@@ -56,40 +57,21 @@ export default class SpinalExcelManager {
     }
 
 
-    public static convertExcelToJson(file: any): Promise<any> {
+    public static async convertExcelToJson(file: Buffer | string): Promise<any> {
+        // console.log(file);
+        let buffer;
+        if (typeof file === "string") {
+            buffer = readFileSync(file);
+        } else {
+            buffer = file;
+        }
+
+        if (typeof window !== "undefined") {
+            return this.convertInNavigator(buffer);
+        }
+
         const convertExcel = new ConvertExcel();
-
-        // const fileReader = new FileReader();
-
-
-        // console.log("file", file);
-
-        return new Promise((resolve, reject) => {
-
-            fileReader.onload = async (_file) => {
-                const data = _file.target.result;
-
-
-                const json = await convertExcel.toJson(data);
-
-                return resolve(json);
-
-            }
-
-            //     ///////////////////////////////////////////////
-            //     //                  On Error
-            //     ///////////////////////////////////////////////
-            fileReader.onerror = err => {
-                reject(err);
-            };
-
-
-            fileReader.readAsArrayBuffer(file);
-
-
-        })
-
-
+        return convertExcel.toJson(buffer);
     }
 
 
@@ -128,7 +110,28 @@ export default class SpinalExcelManager {
         })
     }
 
+    private static convertInNavigator(file: any) {
+        const convertExcel = new ConvertExcel();
+        const fileReader = new FileReader();
 
+        return new Promise((resolve, reject) => {
+            fileReader.onload = async (_file) => {
+                const data = _file.target.result;
+
+                const json = await convertExcel.toJson(data);
+
+                return resolve(json);
+            }
+            //     ///////////////////////////////////////////////
+            //     //                  On Error
+            //     ///////////////////////////////////////////////
+            fileReader.onerror = err => {
+                reject(err);
+            };
+            fileReader.readAsArrayBuffer(file);
+        })
+
+    }
 
 }
 

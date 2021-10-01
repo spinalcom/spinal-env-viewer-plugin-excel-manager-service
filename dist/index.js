@@ -35,7 +35,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.excelManager = exports.SpinalExcelManager = void 0;
 const CreateExcel_1 = require("./classes/CreateExcel");
 const convertExcel_1 = require("./classes/convertExcel");
-const filereader_1 = require("filereader");
+const fs_1 = require("fs");
 // console.log("FileReader", FileReader)
 class SpinalExcelManager {
     static export(argExcelsData) {
@@ -57,22 +57,20 @@ class SpinalExcelManager {
         return Promise.all(promises);
     }
     static convertExcelToJson(file) {
-        const convertExcel = new convertExcel_1.default();
-        // const fileReader = new FileReader();
-        // console.log("file", file);
-        return new Promise((resolve, reject) => {
-            filereader_1.default.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
-                const data = _file.target.result;
-                const json = yield convertExcel.toJson(data);
-                return resolve(json);
-            });
-            //     ///////////////////////////////////////////////
-            //     //                  On Error
-            //     ///////////////////////////////////////////////
-            filereader_1.default.onerror = err => {
-                reject(err);
-            };
-            filereader_1.default.readAsArrayBuffer(file);
+        return __awaiter(this, void 0, void 0, function* () {
+            // console.log(file);
+            let buffer;
+            if (typeof file === "string") {
+                buffer = fs_1.readFileSync(file);
+            }
+            else {
+                buffer = file;
+            }
+            if (typeof window !== "undefined") {
+                return this.convertInNavigator(buffer);
+            }
+            const convertExcel = new convertExcel_1.default();
+            return convertExcel.toJson(buffer);
         });
     }
     static convertConfigurationFile(file) {
@@ -89,6 +87,24 @@ class SpinalExcelManager {
             ///////////////////////////////////////////////
             //                  On Error
             ///////////////////////////////////////////////
+            fileReader.onerror = err => {
+                reject(err);
+            };
+            fileReader.readAsArrayBuffer(file);
+        });
+    }
+    static convertInNavigator(file) {
+        const convertExcel = new convertExcel_1.default();
+        const fileReader = new FileReader();
+        return new Promise((resolve, reject) => {
+            fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
+                const data = _file.target.result;
+                const json = yield convertExcel.toJson(data);
+                return resolve(json);
+            });
+            //     ///////////////////////////////////////////////
+            //     //                  On Error
+            //     ///////////////////////////////////////////////
             fileReader.onerror = err => {
                 reject(err);
             };
