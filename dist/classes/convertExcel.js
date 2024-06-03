@@ -37,8 +37,8 @@ class ConvertExcel {
     constructor(headerRow = 1) {
         this.workbook = new Excel.Workbook();
     }
-    toJson(data, headerRow = 1) {
-        return __awaiter(this, void 0, void 0, function* () {
+    toJson(data_1) {
+        return __awaiter(this, arguments, void 0, function* (data, headerRow = 1) {
             yield this.workbook.xlsx.load(data);
             let result = {};
             this.workbook.eachSheet((sheet) => {

@@ -61,7 +61,7 @@ class SpinalExcelManager {
             // console.log(file);
             let buffer;
             if (typeof file === "string") {
-                buffer = fs_1.readFileSync(file);
+                buffer = (0, fs_1.readFileSync)(file);
             }
             else {
                 buffer = file;
