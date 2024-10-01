@@ -86,7 +86,7 @@ export default class ConvertExcel {
                 result = cell;
             }
         });
-
+        if(result && result.value.result) return result.value.result
         return result ? result.value : "";
     }
 
