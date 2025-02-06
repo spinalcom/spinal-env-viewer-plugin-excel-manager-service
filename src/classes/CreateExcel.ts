@@ -24,64 +24,52 @@
 
 
 import * as Excel from "exceljs";
+import { THeader, TSheet } from "../types";
+import { promises } from "fs";
 
 export default class CreateExcel {
 
   private workbook: Excel.Workbook;
-  private sheets: Array<{
-    name: string,
-    header: Array<{ key: string | number, header: string }>,
-    rows: Array<{}>
-  }>
 
-  constructor(
-    sheets: Array<{
-      name: string,
-      header: Array<{ key: string | number, header: string }>,
-      rows: Array<{}>
-    }>,
-    author?: string) {
+  constructor(private sheets: TSheet[], author: string = "spinalcom developer") {
     this.workbook = new Excel.Workbook();
     this.workbook.created = new Date(Date.now());
-    this.sheets = sheets;
   }
 
-
-  public createSheet(): void {
-
-
-    this.sheets.forEach(async argSheet => {
-      let sheet = this.workbook.addWorksheet(argSheet.name, { properties: { tabColor: { argb: 'FFC0000' } } })
-      sheet.state = 'visible';
-      await this.addHeader(sheet, argSheet.header);
-      this.addRows(sheet, argSheet.rows);
-    })
-
-  }
-
-  public addHeader(sheet: any, headers: Array<{ key: string | number, header: string }>): void {
-    if (sheet.columns && sheet.columns.length > 0) {
-      sheet.columns = [...sheet.columns, ...headers]
-    } else {
-      sheet.columns = headers;
-    }
-  }
-
-  public addRows(sheet, argRows: Array<{}> | Object): void {
-    let rows = Array.isArray(argRows) ? argRows : [argRows];
-    rows.forEach(row => {
-      const r = sheet.addRow(row);
-    })
-
-  }
-
-  public getWorkbook(): any {
-    // console.log(this.workbook);
+  public getWorkbook(): Promise<Excel.Buffer> {
     return this.workbook.xlsx.writeBuffer();
   }
 
-  public getWorkbookInstance() {
+  public getWorkbookInstance(): Excel.Workbook {
     return this.workbook;
+  }
+
+  public async createSheet(): Promise<Excel.Worksheet[]> {
+
+    const promises = this.sheets.map(async argSheet => {
+      let sheet: Excel.Worksheet = this.workbook.addWorksheet(argSheet.name, { properties: { tabColor: { argb: 'FFC0000' } } })
+      sheet.state = 'visible';
+      await this._addHeader(sheet, argSheet.header);
+      this._addRows(sheet, argSheet.rows);
+      return sheet;
+    })
+
+    return Promise.all(promises);
+  }
+
+  private _addHeader(sheet: Excel.Worksheet, headers: THeader[]): void {
+    if (sheet.columns && sheet.columns.length > 0) {
+      sheet.columns = [...sheet.columns, ...headers] as any;
+    } else {
+      sheet.columns = headers as any;
+    }
+  }
+
+  private _addRows(sheet: Excel.Worksheet, argRows: TSheet["rows"]): void {
+    let rows = Array.isArray(argRows) ? argRows : [argRows];
+    for (const row of rows) {
+      sheet.addRow(row);
+    }
   }
 
 }

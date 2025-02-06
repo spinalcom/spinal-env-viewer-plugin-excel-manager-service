@@ -28,113 +28,148 @@ export default class ConvertExcel {
 
     private workbook: Excel.Workbook;
 
-    constructor(headerRow: number = 1) {
+    constructor() {
         this.workbook = new Excel.Workbook();
-
     }
 
-    public async toJson(data: any, headerRow: number = 1): Promise<any> {
-        await this.workbook.xlsx.load(data);
+    public async toJson(data: Excel.Buffer | string, headerRow: number = 1): Promise<any> {
+        await this.workbook.xlsx.load(data as any);
+
         let result = {}
 
-        this.workbook.eachSheet((sheet) => {
+        this.workbook.eachSheet((sheet: Excel.Worksheet) => {
 
-            let begin = headerRow + 1;
-            const end = sheet.rowCount;
+            result[sheet.name] = this._convertSheetToJson(sheet);
 
-            result[sheet.name] = [];
+            // let begin = headerRow + 1;
+            // const end = sheet.rowCount;
+            // result[sheet.name] = [];
 
-            let headers = this._getHeaders(sheet, headerRow);
+            // for (; begin <= end; begin++) {
+            //     let res = {};
 
-            for (; begin <= end; begin++) {
-                let res = {};
+            //     let headers = this._getHeaders(sheet); // get headers
+            //     headers.forEach(header => {
+            //         res[header] = this._getValueByColumnHeader(sheet, begin, headers, header);
+            //     })
 
-                headers.forEach(header => {
-                    res[header] = this._getValueByColumnHeader(sheet, begin, headers, header);
-                })
-
-                result[sheet.name].push(res);
-            }
+            //     result[sheet.name].push(res);
+            // }
 
         })
 
         return result;
     }
 
-    private _getHeaders(sheet: any, headerRow: number = 1) {
-        let result: string[] = [];
-        // let index = 1;
 
-        let row = sheet.getRow(headerRow);
+    public async configurationToJson(data: Excel.Buffer | string): Promise<any> {
+        await this.workbook.xlsx.load(data as any);
+
+        // let result = {}
+
+        // this.workbook.eachSheet((sheet) => {
+
+        //     let begin = headerRow + 1;
+        //     const end = sheet.rowCount;
+
+        //     result[sheet.name] = [];
+
+        //     let headers = this._getHeaders(sheet);
+
+        //     for (; begin <= end; begin++) {
+        //         let res = {};
+
+        //         headers.forEach(header => {
+        //             const row = sheet.getRow(begin);
+        //             res[header] = this._getValueByColumnHeader(sheet, header);
+        //         })
+
+        //         for (let index = 1; index <= 3; index++) {
+        //             const header = this._getHeaders(sheet);
+
+        //             const key = header[0].replace(":", "").trim();
+        //             const value = header[1];
+        //             res[key] = value;
+        //         }
+
+        //         result[sheet.name].push(res);
+        //     }
+
+
+
+        // })
+
+        // return result;
+    }
+
+    private _convertSheetToJson(sheet: Excel.Worksheet): { [key: string]: any }[] {
+        const headers = this._getHeaders(sheet);
+        const rows = sheet.getRows(2, sheet.rowCount);
+        const result = [];
+
+        for (let i = 1; i < rows.length; i++) {
+            let res = {};
+            for (let header of headers) {
+                res[header] = this._getValueByColumnHeader(rows[i], header);
+            }
+
+            result.push(res);
+        }
+
+        return result;
+    }
+
+    private _getHeaders(sheet: Excel.Worksheet): string[] {
+        let result: string[] = [];
+
+        let row = sheet.getRow(1);
 
         if (row === null || !row.values || !row.values.length) return [];
 
-        for (let i: number = 1; i < row.values.length; i++) {
+        for (let i: number = 1; i < row.cellCount; i++) {
             let cell = row.getCell(i);
             result.push(cell.text);
         }
-        return result;
-    }
-
-    private _getValueByColumnHeader(sheet, rowNumber: number, headers: Array<string>, header: string) {
-        let row = sheet.getRow(rowNumber);
-        let result: Excel.Cell | undefined;
-
-        row.eachCell(function (cell: Excel.Cell, colNumber: number) {
-            let fetchedHeader: string = headers[colNumber - 1];
-            if ((fetchedHeader && header) && fetchedHeader.toLowerCase().trim() === header.toLowerCase().trim()) {
-                result = cell;
-            }
-        });
-        if((<any>result)?.value?.result) return (<any>result).value.result
-        return result ? result.value : "";
-    }
-
-    public async configurationToJson(data: any, headerRow): Promise<any> {
-        await this.workbook.xlsx.load(data);
-
-        let result = {}
-
-        this.workbook.eachSheet((sheet) => {
-
-            let begin = headerRow + 1;
-            const end = sheet.rowCount;
-
-            result[sheet.name] = [];
-
-            let headers = this._getHeaders(sheet, headerRow);
-
-            for (; begin <= end; begin++) {
-                let res = {};
-
-                headers.forEach(header => {
-                    res[header] = this._getValueByColumnHeader(sheet, begin, headers, header);
-                })
-
-                // const firstConfHeader = this._getHeaders(sheet, 1);
-
-                // firstConfHeader.forEach(el => {
-                //     res[el] = this._getValueByColumnHeader(sheet, 2, firstConfHeader, el);
-                // })
-
-                for (let index = 1; index <= 3; index++) {
-                    const header = this._getHeaders(sheet, index);
-
-                    console.log("header", header);
-
-                    const key = header[0].replace(":", "").trim();
-                    const value = header[1];
-                    res[key] = value;
-                }
-
-                result[sheet.name].push(res);
-            }
-
-
-
-        })
 
         return result;
     }
+
+    private _getValueByColumnHeader(row: Excel.Row, header: string) {
+
+        let cell = this._foundCellByHeaderName(row, header);
+        if (!cell) return "";
+
+        return this._getCellValue(cell);
+
+    }
+
+    private _foundCellByHeaderName(row: Excel.Row, header: string): Excel.Cell | undefined {
+        for (let i = 0; i <= row.cellCount; i++) {
+            let cell = row.getCell(i);
+            if (cell.text.toLowerCase() === header.toLowerCase()) {
+                return cell;
+            }
+        }
+    }
+
+    private _getCellValue(cell: Excel.Cell) {
+        const type = cell.type;
+
+        switch (type) {
+            case Excel.ValueType.Date:
+                return (cell.value as Date).toLocaleDateString();
+
+            case Excel.ValueType.Formula:
+                return (cell.value as Excel.CellFormulaValue).result;
+
+            case Excel.ValueType.Hyperlink:
+                return (cell.value as Excel.CellHyperlinkValue).text;
+
+            default:
+                return cell.value;
+
+        }
+    }
+
 
 }

@@ -34,20 +34,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Excel = require("exceljs");
 class CreateExcel {
-    constructor(sheets, author) {
+    constructor(sheets, author = "spinalcom developer") {
+        this.sheets = sheets;
         this.workbook = new Excel.Workbook();
         this.workbook.created = new Date(Date.now());
-        this.sheets = sheets;
+    }
+    getWorkbook() {
+        return this.workbook.xlsx.writeBuffer();
+    }
+    getWorkbookInstance() {
+        return this.workbook;
     }
     createSheet() {
-        this.sheets.forEach((argSheet) => __awaiter(this, void 0, void 0, function* () {
-            let sheet = this.workbook.addWorksheet(argSheet.name, { properties: { tabColor: { argb: 'FFC0000' } } });
-            sheet.state = 'visible';
-            yield this.addHeader(sheet, argSheet.header);
-            this.addRows(sheet, argSheet.rows);
-        }));
+        return __awaiter(this, void 0, void 0, function* () {
+            const promises = this.sheets.map((argSheet) => __awaiter(this, void 0, void 0, function* () {
+                let sheet = this.workbook.addWorksheet(argSheet.name, { properties: { tabColor: { argb: 'FFC0000' } } });
+                sheet.state = 'visible';
+                yield this._addHeader(sheet, argSheet.header);
+                this._addRows(sheet, argSheet.rows);
+                return sheet;
+            }));
+            return Promise.all(promises);
+        });
     }
-    addHeader(sheet, headers) {
+    _addHeader(sheet, headers) {
         if (sheet.columns && sheet.columns.length > 0) {
             sheet.columns = [...sheet.columns, ...headers];
         }
@@ -55,18 +65,11 @@ class CreateExcel {
             sheet.columns = headers;
         }
     }
-    addRows(sheet, argRows) {
+    _addRows(sheet, argRows) {
         let rows = Array.isArray(argRows) ? argRows : [argRows];
-        rows.forEach(row => {
-            const r = sheet.addRow(row);
-        });
-    }
-    getWorkbook() {
-        // console.log(this.workbook);
-        return this.workbook.xlsx.writeBuffer();
-    }
-    getWorkbookInstance() {
-        return this.workbook;
+        for (const row of rows) {
+            sheet.addRow(row);
+        }
     }
 }
 exports.default = CreateExcel;

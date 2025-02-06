@@ -9,7 +9,8 @@
     "module": "commonjs",
     "outDir": "dist",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "declarationDir": "declarations"
 
   },
   "include": [

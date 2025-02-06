@@ -81,7 +81,7 @@ class SpinalExcelManager {
         return new Promise((resolve, reject) => {
             fileReader.onload = (_file) => __awaiter(this, void 0, void 0, function* () {
                 const data = _file.target.result;
-                const json = yield convertExcel.configurationToJson(data, headerRow);
+                const json = yield convertExcel.configurationToJson(data);
                 return resolve(json);
             });
             ///////////////////////////////////////////////
