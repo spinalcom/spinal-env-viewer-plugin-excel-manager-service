@@ -89,41 +89,52 @@ class ConvertExcel {
         const headers = this._getHeaders(sheet);
         const rows = sheet.getRows(2, sheet.rowCount);
         const result = [];
-        for (let i = 1; i < rows.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
             let res = {};
-            for (let header of headers) {
-                res[header] = this._getValueByColumnHeader(rows[i], header);
+            for (let col in headers) {
+                const header = headers[col];
+                res[header] = this._getValueByColumnHeader(rows[i], col);
             }
             result.push(res);
         }
         return result;
     }
     _getHeaders(sheet) {
-        let result = [];
+        let result = {};
         let row = sheet.getRow(1);
         if (row === null || !row.values || !row.values.length)
-            return [];
-        for (let i = 1; i < row.cellCount; i++) {
+            return {};
+        for (let i = 1; i <= row.cellCount; i++) {
             let cell = row.getCell(i);
-            result.push(cell.text);
+            result[i] = cell.text;
         }
         return result;
     }
-    _getValueByColumnHeader(row, header) {
-        let cell = this._foundCellByHeaderName(row, header);
+    _getValueByColumnHeader(row, col) {
+        let cell = this._foundCellByHeaderName(row, col);
         if (!cell)
             return "";
         return this._getCellValue(cell);
     }
-    _foundCellByHeaderName(row, header) {
-        for (let i = 0; i <= row.cellCount; i++) {
+    _foundCellByHeaderName(row, headerCol) {
+        for (let i = 1; i <= row.cellCount; i++) {
             let cell = row.getCell(i);
-            if (cell.text.toLowerCase() === header.toLowerCase()) {
+            if (cell.col == headerCol)
                 return cell;
-            }
         }
     }
     _getCellValue(cell) {
+        const type = cell.type;
+        switch (type) {
+            case Excel.ValueType.Date:
+                return cell.value.toLocaleDateString();
+            case Excel.ValueType.Formula:
+                return cell.value.result;
+            case Excel.ValueType.Hyperlink:
+                return cell.value.text;
+            default:
+                return cell.value;
+        }
     }
 }
 exports.default = ConvertExcel;

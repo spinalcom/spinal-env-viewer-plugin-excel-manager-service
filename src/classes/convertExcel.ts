@@ -107,10 +107,11 @@ export default class ConvertExcel {
         const rows = sheet.getRows(2, sheet.rowCount);
         const result = [];
 
-        for (let i = 1; i < rows.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
             let res = {};
-            for (let header of headers) {
-                res[header] = this._getValueByColumnHeader(rows[i], header);
+            for (let col in headers) {
+                const header = headers[col];
+                res[header] = this._getValueByColumnHeader(rows[i], col);
             }
 
             result.push(res);
@@ -119,36 +120,34 @@ export default class ConvertExcel {
         return result;
     }
 
-    private _getHeaders(sheet: Excel.Worksheet): string[] {
-        let result: string[] = [];
+    private _getHeaders(sheet: Excel.Worksheet): { [key: string]: string } {
+        let result = {};
 
         let row = sheet.getRow(1);
 
-        if (row === null || !row.values || !row.values.length) return [];
+        if (row === null || !row.values || !row.values.length) return {};
 
-        for (let i: number = 1; i < row.cellCount; i++) {
+        for (let i: number = 1; i <= row.cellCount; i++) {
             let cell = row.getCell(i);
-            result.push(cell.text);
+            result[i] = cell.text;
         }
 
         return result;
     }
 
-    private _getValueByColumnHeader(row: Excel.Row, header: string) {
+    private _getValueByColumnHeader(row: Excel.Row, col: string) {
 
-        let cell = this._foundCellByHeaderName(row, header);
+        let cell = this._foundCellByHeaderName(row, col);
         if (!cell) return "";
 
         return this._getCellValue(cell);
 
     }
 
-    private _foundCellByHeaderName(row: Excel.Row, header: string): Excel.Cell | undefined {
-        for (let i = 0; i <= row.cellCount; i++) {
+    private _foundCellByHeaderName(row: Excel.Row, headerCol: string): Excel.Cell | undefined {
+        for (let i = 1; i <= row.cellCount; i++) {
             let cell = row.getCell(i);
-            if (cell.text.toLowerCase() === header.toLowerCase()) {
-                return cell;
-            }
+            if (cell.col == headerCol) return cell;
         }
     }
 
